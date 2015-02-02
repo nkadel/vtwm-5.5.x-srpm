@@ -11,20 +11,25 @@ Group: Graphical desktop/Other
 #BuildRequires:	xorg-x11
 #BuildRequires:	xpm-devel
 
-BuildRequires:  /usr/bin/xmkmf
-BuildRequires:	/usr/include/X11/Intrinsic.h
-BuildRequires:	/usr/include/X11/Xft/Xft.h
-BuildRequires:	/usr/include/X11/Xlib.h
-BuildRequires:	/usr/include/X11/Xmu/CharSet.h
-BuildRequires:	/usr/include/X11/extensions/Xinerama.h
-BuildRequires:	/usr/include/X11/extensions/Xrandr.h
-BuildRequires:	/usr/include/X11/extensions/shape.h
-BuildRequires:	/usr/include/X11/xpm.h
+BuildRequires:  %{_bindir}/xmkmf
+BuildRequires:	%{_includedir}/X11/Intrinsic.h
+BuildRequires:	%{_includedir}/X11/Xft/Xft.h
+BuildRequires:	%{_includedir}/X11/Xlib.h
+BuildRequires:	%{_includedir}/X11/Xmu/CharSet.h
+BuildRequires:	%{_includedir}/X11/extensions/Xinerama.h
+BuildRequires:	%{_includedir}/X11/extensions/Xrandr.h
+BuildRequires:	%{_includedir}/X11/extensions/shape.h
+BuildRequires:	%{_includedir}/X11/xpm.h
+
 
 BuildRequires:	bison
-# Explicitely required for RHEL 7
 BuildRequires:	flex
-BuildRequires:	flex-devel
+# Explicitly required for flex in different RHEL versions
+BuildRequires:	%{_includedir}/FlexLexer.h
+BuildRequires:	%{_libdir}/libfl.a
+# Explicitly required for RHEL 5
+BuildRequires:	%{_libdir}/libXinerama.so
+# Explicitely required for libpng in RHEL 7
 BuildRequires:	libpng
 BuildRequires:	libpng-devel
 
@@ -71,7 +76,9 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 %config(noreplace)/etc/X11/wmsession.d/13vtwm
-%config(noreplace) %{_datarootdir}/X11/vtwm/system.vtwmrc
+# _datarootdi not set for RHEL 5
+#%config(noreplace) %{_datarootdir}/X11/vtwm/system.vtwmrc
+%config(noreplace) %{_prefix}/share/X11/vtwm/system.vtwmrc
 %{_bindir}/vtwm
 %{_mandir}/man1/vtwm.1x*
 
