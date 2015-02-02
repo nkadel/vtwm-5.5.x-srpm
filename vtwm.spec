@@ -1,7 +1,7 @@
 Summary: A Windows Manager based on twm with virtual screen
 Name: vtwm
 Version: 5.5.0
-Release: 0.1rc8%{?dist}
+Release: 0.2%{?dist}
 Url: http://www.vtwm.org
 Source0: %{name}-%{version}-rc8.tar.gz
 License: MIT
@@ -12,14 +12,22 @@ Group: Graphical desktop/Other
 #BuildRequires:	xpm-devel
 
 BuildRequires:  /usr/bin/xmkmf
-BuildRequires:	/usr/include/X11/Xlib.h
-BuildRequires:	/usr/include/X11/extensions/shape.h
 BuildRequires:	/usr/include/X11/Intrinsic.h
+BuildRequires:	/usr/include/X11/Xft/Xft.h
+BuildRequires:	/usr/include/X11/Xlib.h
 BuildRequires:	/usr/include/X11/Xmu/CharSet.h
+BuildRequires:	/usr/include/X11/extensions/Xinerama.h
+BuildRequires:	/usr/include/X11/extensions/Xrandr.h
+BuildRequires:	/usr/include/X11/extensions/shape.h
 BuildRequires:	/usr/include/X11/xpm.h
 
 BuildRequires:	bison
+# Explicitely required for RHEL 7
 BuildRequires:	flex
+BuildRequires:	flex-devel
+BuildRequires:	libpng
+BuildRequires:	libpng-devel
+
 BuildRoot: %{_tmppath}/%{name}-buildroot
 
 %description
@@ -68,6 +76,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/vtwm.1x*
 
 %changelog
+* Sun Feb  1 2015 Nico Kadel-Garcia <nkadel@gmail.com> 5.5.0-0.2
+- Add flex and flex-devel dependency for RHEL 7.
+- Add Xft/Xft.h dependency for RHEL 7.
+- Add various extens/*.h dependencies for RHEL 7.
+
 * Sun Jul  7 2013 Nico Kadel-Garcia <nkadel@gmail.com> 5.5.0-rc8
 - Update for Fedora 19 and RHEL 5
 - Throw out "mkrel" macro from Mandriva, use hardcoded release number.
