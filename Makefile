@@ -5,10 +5,13 @@
 # Assure that sorting is case sensitive
 LANG=C
 
+## epel-7-ie86 does not exist
+##MOCKS+=epel-7-i386
 #MOCKS+=epel-6-i386
 #MOCKS+=epel-5-i386
 #MOCKS+=epel-4-i386
 
+MOCKS+=epel-7-x86_64
 MOCKS+=epel-6-x86_64
 MOCKS+=epel-5-x86_64
 MOCKS+=epel-4-x86_64
