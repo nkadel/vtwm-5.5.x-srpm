@@ -1,68 +1,77 @@
 #
-# Build mock and local RPM versions of tools
+# Build mock and local RPM versions of tools for Samba
 #
 
 # Assure that sorting is case sensitive
 LANG=C
 
-## epel-7-ie86 does not exist
-## epel-4-* has been discarded from mock
-##MOCKS+=epel-7-i386
-#MOCKS+=epel-6-i386
-#MOCKS+=epel-5-i386
-##MOCKS+=epel-4-i386
-
+#
 MOCKS+=epel-7-x86_64
-MOCKS+=epel-6-x86_64
-MOCKS+=epel-5-x86_64
-#MOCKS+=epel-4-x86_64
+MOCKS+=epel-8-x86_64
+MOCKS+=fedora-34-x86_64
+
+REPOBASEDIR:=$(PWD)/repo
 
 SPEC := `ls *.spec | head -1`
-PKGNAME := "`ls *.spec | head -1 | sed 's/.spec$$//g'`"
 
-all:: verifyspec $(MOCKS)
+all:: $(MOCKS)
 
-# Oddness to get deduced .spec file verified
-verifyspec:: FORCE
-	@if [ ! -e $(SPEC) ]; then \
-	    echo Error: SPEC file $(SPEC) not found, exiting; \
-	    exit 1; \
-	fi
+.PHONY: getsrc
+getsrc::
+	spectool -g $(SPEC)
 
-srpm:: verifyspec FORCE
+srpm:: src.rpm
+
+#.PHONY:: src.rpm
+src.rpm:: Makefile
+	@rm -rf rpmbuild
+	@rm -f $@
 	@echo "Building SRPM with $(SPEC)"
-	rm -f $(PKGNAME)*.src.rpm
-	rpmbuild --define '_sourcedir $(PWD)' \
-		--define '_srcrpmdir $(PWD)' \
+	rpmbuild --define '_topdir $(PWD)/rpmbuild' \
+		--define '_sourcedir $(PWD)' \
 		-bs $(SPEC) --nodeps
+	mv rpmbuild/SRPMS/*.src.rpm src.rpm
 
-build:: srpm FORCE
-	rpmbuild --rebuild `ls *.src.rpm | grep -v ^epel-`
+.PHONY: build
+build:: src.rpm
+	rpmbuild --define '_topdir $(PWD)/rpmbuild' \
+		--rebuild $?
 
-$(MOCKS):: verifyspec FORCE
-	@if [ -e $@ -a -n "`find $@ -name \*.rpm`" ]; then \
-		echo "Skipping RPM populated $@"; \
-	else \
-		echo "Building $@ RPMS with $(SPEC)"; \
-		rm -rf $@; \
-		mock -q -r $@ --sources=$(PWD) \
-		    --resultdir=$(PWD)/$@ \
-		    --buildsrpm --spec=$(SPEC); \
-		echo "Storing $@/*.src.rpm in $@.rpm"; \
-		/bin/mv $@/*.src.rpm $@.src.rpm; \
-		echo "Actally building RPMS in $@"; \
-		rm -rf $@; \
-		mock -q -r $@ \
-		     --resultdir=$(PWD)/$@ \
-		     $@.src.rpm; \
-	fi
+.PHONY: $(MOCKS)
+$(MOCKS):: src.rpm
+	@set -o pipefail; ls -d $@/*.rpm 2>/dev/null | grep -q -v src.rpm  && \
+	    echo "    RPMs in $@, skipping" && exit 0 || \
+	    rm -rf $@ && \
+	    echo "    Building $? in $@" && \
+	    mock -q -r /etc/mock/$@.cfg \
+		--resultdir=$(PWD)/$@ $?
 
 mock:: $(MOCKS)
 
+install:: $(MOCKS)
+	@for repo in $(MOCKS); do \
+	    echo Installing $$repo; \
+	    case $$repo in \
+		*-7-x86_64) yumrelease=el/7; yumarch=x86_64; ;; \
+		*-8-x86_64) yumrelease=el/8; yumarch=x86_64; ;; \
+		*-34-x86_64) yumrelease=fedora/34; yumarch=x86_64; ;; \
+		*-f34-x86_64) yumrelease=fedora/34; yumarch=x86_64; ;; \
+		*-rawhide-x86_64) yumrelease=fedora/rawhide; yumarch=x86_64; ;; \
+		*) echo "Unrecognized release for $$repo, exiting" >&2; exit 1; ;; \
+	    esac; \
+	    rpmdir=$(REPOBASEDIR)/$$yumrelease/$$yumarch; \
+	    srpmdir=$(REPOBASEDIR)/$$yumrelease/SRPMS; \
+	    echo "    Pushing SRPMS to $$srpmdir"; \
+	    rsync -a $$repo/*.src.rpm --no-owner --no-group $$repo/*.src.rpm $$srpmdir/. || exit 1; \
+	    createrepo -q $$srpmdir/.; \
+	    echo "    Pushing RPMS to $$rpmdir"; \
+	    rsync -a $$repo/*.rpm --exclude=*.src.rpm --exclude=*debuginfo*.rpm --no-owner --no-group $$repo/*.rpm $$rpmdir/. || exit 1; \
+	    createrepo -q $$rpmdir/.; \
+	done
+
 clean::
-	rm -rf $(MOCKS)
+	rm -rf */
+	rm -f *.out
+	rm -f *.rpm
 
 realclean distclean:: clean
-	rm -f *.src.rpm
-
-FORCE:
