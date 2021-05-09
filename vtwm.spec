@@ -1,9 +1,13 @@
+# Disable debuginfo, it causes EL 8 and Fedora compilation confusion
+%global debug_package %{nil}
+
 Summary: A Windows Manager based on twm with virtual screen
 Name: vtwm
 Version: 5.5.0
 Release: 0.2%{?dist}
 Url: http://www.vtwm.org
-Source0: %{name}-%{version}-rc8.tar.gz
+#Source0: %{name}-%{version}-rc8.tar.gz
+Source0:: http://sourceforge.net/projects/vtwm/files/vtwm-5.5.0.tar.gz
 License: MIT
 Group: Graphical desktop/Other
 # Manually added
@@ -43,7 +47,7 @@ it implements some extensions such as virtual desktop.
 This package is in plf because it mimic Windows(tm) look and feel.
 
 %prep
-%setup -q -n %{name}-%{version}-rc8
+%setup -q -n %{name}-%{version}
 
 %build
 xmkmf
@@ -77,7 +81,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %config(noreplace)/etc/X11/wmsession.d/13vtwm
 # _datarootdi not set for RHEL 5
-#%config(noreplace) %{_datarootdir}/X11/vtwm/system.vtwmrc
+#%config(noreplace) %%{_datarootdir}/X11/vtwm/system.vtwmrc
 %config(noreplace) %{_prefix}/share/X11/vtwm/system.vtwmrc
 %{_bindir}/vtwm
 %{_mandir}/man1/vtwm.1x*
