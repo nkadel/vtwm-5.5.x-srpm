@@ -7,7 +7,7 @@ Version: 5.5.0
 Release: 0.2%{?dist}
 Url: http://www.vtwm.org
 #Source0: %{name}-%{version}-rc8.tar.gz
-Source0:: http://sourceforge.net/projects/vtwm/files/vtwm-5.5.0.tar.gz
+Source: https://sourceforge.net/projects/vtwm/files/vtwm-%{version}.tar.gz
 License: MIT
 Group: Graphical desktop/Other
 # Manually added
