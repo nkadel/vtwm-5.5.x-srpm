@@ -4,9 +4,8 @@
 Summary: A Windows Manager based on twm with virtual screen
 Name: vtwm
 Version: 5.5.0
-Release: 0.2%{?dist}
+Release: 0.3%{?dist}
 Url: http://www.vtwm.org
-#Source0: %{name}-%{version}-rc8.tar.gz
 Source: https://sourceforge.net/projects/vtwm/files/vtwm-%{version}.tar.gz
 License: MIT
 Group: Graphical desktop/Other
@@ -15,6 +14,7 @@ Group: Graphical desktop/Other
 #BuildRequires:	xorg-x11
 #BuildRequires:	xpm-devel
 
+# Explicitly required for X11 in different RHEL versions
 BuildRequires:  %{_bindir}/xmkmf
 BuildRequires:	%{_includedir}/X11/Intrinsic.h
 BuildRequires:	%{_includedir}/X11/Xft/Xft.h
@@ -87,6 +87,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/vtwm.1x*
 
 %changelog
+* Sun May 29 2022 Nico Kadel-Garcia <nkadel@gmail.com> 5.5.0-0.3
+- Update Source URL
+
 * Sun Feb  1 2015 Nico Kadel-Garcia <nkadel@gmail.com> 5.5.0-0.2
 - Add flex and flex-devel dependency for RHEL 7.
 - Add Xft/Xft.h dependency for RHEL 7.
