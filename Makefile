@@ -6,10 +6,10 @@
 LANG=C
 
 #
-MOCKS+=centos+epel-7-x86_64
-MOCKS+=centos-stream+epel-8-x86_64
-MOCKS+=centos-stream+epel-9-x86_64
-MOCKS+=fedora-36-x86_64
+MOCKS+=alma+epel-8-x86_64
+MOCKS+=alma+epel-9-x86_64
+#MOCKS+=alma+epel-10-x86_64
+MOCKS+=fedora-40-x86_64
 
 REPOBASEDIR:=$(PWD)/repo
 
@@ -53,11 +53,11 @@ install:: $(MOCKS)
 	@for repo in $(MOCKS); do \
 	    echo Installing $$repo; \
 	    case $$repo in \
-		*-7-x86_64) yumrelease=el/7; yumarch=x86_64; ;; \
 		*-8-x86_64) yumrelease=el/8; yumarch=x86_64; ;; \
 		*-9-x86_64) yumrelease=el/9; yumarch=x86_64; ;; \
-		*-36-x86_64) yumrelease=fedora/36; yumarch=x86_64; ;; \
-		*-f36-x86_64) yumrelease=fedora/36; yumarch=x86_64; ;; \
+		*-10-x86_64) yumrelease=el/10; yumarch=x86_64; ;; \
+		*-40-x86_64) yumrelease=fedora/40; yumarch=x86_64; ;; \
+		*-f40-x86_64) yumrelease=fedora/40; yumarch=x86_64; ;; \
 		*-rawhide-x86_64) yumrelease=fedora/rawhide; yumarch=x86_64; ;; \
 		*) echo "Unrecognized release for $$repo, exiting" >&2; exit 1; ;; \
 	    esac; \
